@@ -1,36 +1,35 @@
-//
-//  ContentView.swift
-//  ColorApp Watch App
-//
-//  Created by Onur Ucar on 2/24/24.
-//
-
 import SwiftUI
+import WatchKit
 
 struct ContentView: View {
     @StateObject private var colorViewModel = ColorViewModel()
-
+    
     var body: some View {
-        VStack {
-            HStack {
-                ForEach(colorViewModel.colorPalette.prefix(3), id: \.self) { color in
-                    Color(hex: color.hexString) // Assuming you have a Color extension to convert RGB to Color
-                        .frame(width: 50, height: 50)
-                        .cornerRadius(8)
-                        .overlay(
-                            Text(color.hexString)
-                                .foregroundColor(.white)
-                                .font(.caption)
-                                .padding(4)
-                        )
+        ZStack {
+            Color.black.edgesIgnoringSafeArea(.all)
+                .onTapGesture(count: 2) {
+                    colorViewModel.fetchRandomColorPalette()
                 }
+            
+            VStack {
+                ScrollView {
+                    VStack(spacing: 0) {
+                        ForEach(colorViewModel.colorPalette, id: \.self) { color in
+                            ColorView(rgb: color)
+                                .frame(maxWidth: .infinity)
+                        }
+                    }
+                    .frame(maxWidth: .infinity, alignment: .topLeading)
+                    .offset(y: 0)
+                }
+                .disabled(true)
             }
-
-            Button("Get Random Colors") {
+            .onTapGesture(count: 2) {
                 colorViewModel.fetchRandomColorPalette()
             }
+            // Ignore safe area insets
+            .ignoresSafeArea()
         }
-        .padding()
     }
 }
 
@@ -40,19 +39,27 @@ struct ContentView_Previews: PreviewProvider {
     }
 }
 
+struct ColorView: View {
+    let rgb: [Int]
+    
+    var body: some View {
+        Color(red: Double(rgb[0]) / 255.0, green: Double(rgb[1]) / 255.0, blue: Double(rgb[2]) / 255.0)
+            .frame(height: 48.5)
+            .frame(width: .infinity)
+            .overlay(
+                Text(rgb.hexString)
+                    .foregroundColor(.white)
+                    .font(.caption)
+                    .padding(0)
+            )
+    }
+}
+
 extension Array where Element == Int {
     var hexString: String {
         let r = String(format: "%02X", self[0])
         let g = String(format: "%02X", self[1])
         let b = String(format: "%02X", self[2])
         return "#\(r)\(g)\(b)"
-    }
-}
-
-struct ColorViewModel: ObservableObject {
-    @Published var colorPalette: [[Int]] = []
-
-    func fetchRandomColorPalette() {
-        // ... (rest of the code remains the same)
     }
 }

@@ -1,11 +1,22 @@
-import Foundation
+//
+//  ColorViewModel.swift
+//  ColorApp Watch App
+//
+//  Created by Onur Ucar on 2/24/24.
+//
 
-struct APIResponse: Decodable {
-    let result: [[Int]]
-}
+
+import SwiftUI
 
 class ColorViewModel: ObservableObject {
     @Published var colorPalette: [[Int]] = []
+
+    init() {
+        // Fetch random color palette only if colorPalette is empty
+        if colorPalette.isEmpty {
+            fetchRandomColorPalette()
+        }
+    }
 
     func fetchRandomColorPalette() {
         let apiUrlString = "http://colormind.io/api/"
@@ -51,6 +62,10 @@ class ColorViewModel: ObservableObject {
             } catch {
                 print("Error decoding JSON: \(error)")
             }
-        }.resume() as? URLSessionDataTask
+        }.resume()
     }
+}
+
+struct APIResponse: Decodable {
+    let result: [[Int]]
 }
