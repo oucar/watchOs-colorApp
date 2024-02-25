@@ -8,7 +8,7 @@
 
 import SwiftUI
 
-class ColorViewModel: ObservableObject {
+class ColorDataProvider: ObservableObject {
     @Published var colorPalette: [[Int]] = []
 
     init() {
